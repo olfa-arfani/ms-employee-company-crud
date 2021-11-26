@@ -1,0 +1,132 @@
+swagger: '2.0'
+info:
+  description: This is a simple API
+  version: 1.0.0
+  title: Simple Companies management API
+  # put the contact info for your development or API team
+  contact:
+    email: aolfa@outbox.community
+
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+# tags are used for organizing operations
+tags:
+  - name: admins
+    description: Secured Admin-only calls
+  - name: developers
+    description: Operations available to regular developers
+
+paths:
+
+  /company/${name}:
+    delete:
+      tags:
+        - admins
+      summary: delete a company
+      operationId: deleteCompany
+      description: |
+        By passing in the appropriate options, you can delete a company from the system
+      parameters:
+        - in: path
+          name: name
+          type: string
+          required: true
+          description: Numeric ID of the company
+      produces:
+        - application/json
+
+      responses:
+        200:
+          description: successfully deleted
+        400:
+          description: bad input parameter
+
+  /company:
+    get:
+      tags:
+        - developers
+      summary: searches company
+      operationId: searchCompany
+      description: |
+        By passing in the appropriate options, you can search for
+        available employee in the system
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: searchString
+          description: pass an optional search string for looking up company
+          required: false
+          type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          type: integer
+          format: int32
+          minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 50
+      responses:
+        200:
+          description: search results matching criteria
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CompanyItem'
+        400:
+          description: bad input parameter
+    post:
+      tags:
+        - admins
+      summary: create/edit an company item
+      operationId: addCompany
+      description: Create or update an employee in the system
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: companyItem
+          description: Inventory item to add
+          schema:
+            $ref: '#/definitions/CompanyItem'
+      responses:
+        201:
+          description: item created
+        400:
+          description: invalid input, object invalid
+        409:
+          description: an existing item already exists
+definitions:
+  CompanyItem:
+    required:
+      - name
+    properties:
+      email:
+        type: string
+        example: bfox@acme-corp.com
+        format: email
+      name:
+        type: string
+        example: ACME Corporation
+      website:
+        type: string
+        format: url
+        example:  https://www.acme-corp.com
+      phone:
+        type: string
+        example: 408-867-5309
+        pattern: '^\d{3}-\d{3}-\d{4}$'
+# Added by API Auto Mocking Plugin
+host: virtserver.swaggerhub.com
+basePath: /olfa-arfani/companies-api/1.0.0
+schemes:
+  - https
